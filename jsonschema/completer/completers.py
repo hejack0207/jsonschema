@@ -5,13 +5,12 @@ except ImportError:
     requests = None
 import contextlib
 
-from jsonschema import _utils
+from utils import URIDict, RefResolutionError
 from jsonschema.compat import (
     Sequence, urljoin, urlsplit, urldefrag, unquote, urlopen,
     str_types, int_types, iteritems, lru_cache,
 )
-from jsonschema.exceptions import RefResolutionError
-meta_schemas = _utils.URIDict()
+meta_schemas = URIDict()
 
 def _array():
     return ["[]",]
@@ -124,7 +123,7 @@ class RefResolver(object):
         self.handlers = dict(handlers)
 
         self._scopes_stack = [base_uri]
-        self.store = _utils.URIDict(
+        self.store = URIDict(
             (id, validator.META_SCHEMA)
             for id, validator in iteritems(meta_schemas)
         )
