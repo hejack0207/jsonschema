@@ -76,6 +76,6 @@ if __name__ == '__main__':
         resolver=RefResolver.from_schema(swagger)
         completion=dict()
         complete(swagger,completion)
-        print completion
+        print json.dumps(completion)
 
 
