@@ -31,6 +31,7 @@ completers={
 resolver=None
 
 def ref(ref, schema, completions):
+    print ref
     scope, resolved = resolver.resolve(ref)
     resolver.push_scope(scope)
 
@@ -45,31 +46,29 @@ def complete(schema, completions):
         c = completers[schema['type']]
         candidates = c()
         completions['values']=candidates
-        if schema['type'] == 'object':
-            if 'properties' in schema:
-                properties=schema['properties']
-                keys=properties.keys()
-                #print keys
-                completions['keys']=keys
-                for key in keys:
-                    print "key:"+key
-                    completions[key]=dict()
-                    complete(properties[key],completions[key])
-    else:
-        if '$ref' in schema:
-            print "resolving reference"
-            ref(schema["$ref"],schema,completions)
-        elif "anyOf" in schema:
-            for seq in schema["anyOf"]:
-                complete(seq,completions)
-        elif "allOf" in schema:
-            for seq in schema["allOf"]:
-                complete(seq,completions)
-        elif "oneOf" in schema:
-            for seq in schema["oneOf"]:
-                complete(seq,completions)
-        else:
-            print "completions:"+'no type'
+
+    if 'properties' in schema:
+        properties=schema['properties']
+        keys=properties.keys()
+        #print keys
+        completions['keys']=keys
+        for key in keys:
+            print "key:"+key
+            completions[key]=dict()
+            complete(properties[key],completions[key])
+
+    if '$ref' in schema:
+        print "resolving reference"
+        ref(schema["$ref"],schema,completions)
+    if "anyOf" in schema:
+        for seq in schema["anyOf"]:
+            ref(seq["$ref"],schema,completions)
+    if "allOf" in schema:
+        for seq in schema["allOf"]:
+            ref(seq["$ref"],schema,completions)
+    if "oneOf" in schema:
+        for seq in schema["oneOf"]:
+            ref(seq["$ref"],schema,completions)
 
 if __name__ == '__main__':
     with open("../../samples/swagger-2.0.json") as file:
